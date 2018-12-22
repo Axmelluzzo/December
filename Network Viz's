@@ -1,0 +1,123 @@
+library(readxl)
+library(threejs)
+Sankey_Data <- read_excel("~/3JS/Sankey Data.xlsx")
+Simplified <- read_excel("~/3JS/Simplified.xlsx")
+BLAKE <- read_excel("~/3JS/BLAKE.xlsx")
+BLK <- graph.data.frame(BLAKE)
+ColAdd<-sample(100:1800,1458,replace = TRUE)
+BLAKE2<- cbind(ColAdd,BLAKE)
+BLK2<-graph.data.frame(BLAKE2)
+
+
+
+Visualization1<- function(){
+  
+  graphjs(BLAKE,vertex.label = BLAKE$Workbook,vertex.shape = "sphere",vertex.color = "darkorchid3",
+          vertex.size = .62,bg="black",edge.color = "lawngreen",edge.width = .02,
+          main = "Cigna Network Diagram",edge.alpha = .03)
+  
+} 
+
+## Purple/Green ##
+Visualization1()
+##              ##
+
+
+
+Visualization2<- function(){
+  graphjs(BLAKE,vertex.label = BLAKE$Workbook,vertex.shape = "sphere",vertex.color = rainbow(275),
+        vertex.size = .62,bg="black",edge.color = "lawngreen",edge.width = .02,
+        main = "Cigna Network Diagram",edge.alpha = .03, brush=TRUE,use.orbitcontrols=FALSE, cumulative=TRUE,
+        highlight="#CE1483",lowlight="#CED0CE")
+}
+
+## Colorful ##
+Visualization2()
+##          ##
+
+
+
+
+
+Visualization3<- function(){
+  
+  graphjs(BLK,vertex.label = BLK$Workbook,vertex.shape = "sphere",vertex.color = rainbow(275),
+          vertex.size = .92,bg="black",edge.color = "lawngreen",edge.width = .03,
+          main = "Cigna Network Diagram",edge.alpha = .022, brush=TRUE,use.orbitcontrols=FALSE, cumulative=TRUE,
+          highlight="#CE1483",lowlight="#CED0CE",cumulative=TRUE,layout = layout_on_sphere(BLK))
+}
+
+##Spheres!##
+Visualization3()
+##        ##
+
+
+
+Visualization4<- function(){
+  
+  
+  graphjs(BLK2,vertex.label = BLK2$Workbook,vertex.shape = "sphere",vertex.color = rainbow(1800),
+          vertex.size = .62,bg="black",edge.color = "lawngreen",edge.width = .02,
+          main = "Cigna Network Diagram",edge.alpha = .06, brush=TRUE,use.orbitcontrols=FALSE, cumulative=TRUE,
+          highlight="#CE1483",lowlight="#CED0CE",cumulative=TRUE,layout = layout_randomly(BLK2, dim = 3))
+}
+
+##RNDM Layout##
+Visualization4()
+##           ##
+
+
+
+
+
+Visualization5 <- function()
+{
+  
+  graphjs(BLK2,vertex.label = BLK2$Workbook,vertex.shape = "sphere",vertex.color = rainbow(800),
+          vertex.size = .62,bg="black",edge.color = "lawngreen",edge.width = .02,
+          main = "Cigna Network Diagram",edge.alpha = .03, brush=TRUE,use.orbitcontrols=FALSE, cumulative=TRUE,
+          highlight="#CE1483",lowlight="#CED0CE",cumulative=TRUE,layout = layout_with_fr(BLK2, dim = 3, niter=30))
+  
+}
+
+##Grouped##
+Visualization5()
+##       ##
+
+
+
+
+
+
+
+                    #########    ##########    ########   ############     ###########  #
+                    ##   #########  #######################   ######   ################ #
+                    ###############     ###########  #########    ###########    ####   #
+                    ###################### Scratch Pad ################################ # 
+                    #########    ##########    ########   ############     ###########  #
+                    ##   #########  #######################   ######   ################ #
+                    ###############     ###########  #########    ###########    ####   #
+
+
+
+
+
+
+
+
+x<-unique(BLAKE[,1])
+
+y<-split(x,seq(nrow(x)))
+
+cbind(BLK,y)
+#^ Trying to use this for click in order to animate for each click^#
+#Really interesting error when plugged in below#
+
+graphjs(Sankey_Data,vertex.label = Sankey_Data[,Workbook],vertex.shape = "sphere",vertex.color = rainbow(875),
+        vertex.size = .62,bg="black",edge.color = "lawngreen",edge.width = .02,
+        main = "Cigna Network Diagram",edge.alpha = .03, brush=FALSE,use.orbitcontrols=TRUE,
+        highlight="#CE1483",lowlight="#CED0CE",click=Sankey_Data,cumulative=FALSE)
+
+
+###########GROUPED!###########
+
