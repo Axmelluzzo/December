@@ -1,0 +1,137 @@
+
+
+CREATE function MyStoredFunction(payload json) RETURNS AS $$
+
+    BEGIN
+
+        --SELECT * FROM (SELECT payload ->> 'Fieldname' as Field Name from STAGINGTABLE;) AS STAGINGTABLECOLUMNNAMES;
+
+        SELECT * FROM (SELECT attname AS col FROM pg_attribute WHERE  attrelid = 'tableauextension'::regclass AND attnum > 0 AND NOT attisdropped ORDER BY attnum;) AS REPORTINGTABLECOLUMNNAMES;
+
+        select count(distinct attname) from pg_attribute where attrelid = 'REPORTINGTABLE'::regclass AND attnum > 0 AND NOT attisdropped ORDER BY attnum AS REPORTDISTINCT;
+
+        -- select count(distinct FieldName) from STAGINGTABLE AS STAGEDISTINCT;
+
+
+
+        CREATE TABLE JSON_FIELDS (
+           (select json_array_elements(payload) from STAGINGTABLE;), varchar(1000);
+        );
+
+
+
+ 
+            WHILE REPORTDISTINCT > STAGEDISTINCT LOOP
+                IF STAGINGCOLUMNNAMES <> REPORTINGTABLECOLUMNNAMES THEN
+                    ALTER TABLE REPORTINGTABLE ADDCOLUMN (SELECT * DISTINCT FROM STAGINGTABLECOLUMNNAMES WHERE STAGINGCOLUMNNAMES <> REPORTINGTABLECOLUMNNAMES);
+                    INSERT INTO REPORTINGTABLE VALUES (STAGINGTABLE.LAN, STAGINGTABLE.Comment, STAGINGTABLE.FieldValue) 
+                        WHERE REPORTINGTABLECOLUMNNAMES.col == STAGINGTABLE.FieldName;
+
+                ELSE IF STAGINGTABLECOLUMNNAMES == REPORTINGTABLECOLUMNNAMES THEN
+                INSERT INTO REPORTINGTABLE VALUES (STAGINGTABLE.LAN, STAGINGTABLE.Comment, STAGINGTABLE.FieldValue) 
+                    WHERE REPORTINGTABLECOLUMNNAMES.col == STAGINGTABLE.FieldName;
+
+                ELSE RETURN
+
+                END IF;
+
+            END LOOP;
+
+     END
+     $$
+
+
+        -- distinct column names in REPORTINGTABLE
+        select count(distinct attname) from pg_attribute where attrelid = 'REPORTINGTABLE'::regclass AND attnum > 0 AND NOT attisdropped ORDER BY attnum; AS REPORTDISTINCT
+
+        -- distinct field name values in STAGINGTABLE
+        select count(distinct FieldName) from STAGINGTABLE AS STAGEDISTINCT
+
+        -- What to do with Counter?
+
+                -- Make sure complete number of columns is == distinct count of FieldNames + 2 (for LAN ID and Comment)
+
+        IF REPORTDISTINCT <> STAGEDISTINCT
+            THEN MyStoredFunction();
+        ELSEIF REPORTDISTINCT == STAGEDISTINCT
+            THEN 
+        END IF;
+
+
+-- Pivot Fieldname
+-- SET THE WHILE LOOP VARIABLES TO THE COUNTERS
+-- JOIN STAGE & REPORTING ON REPORT.COL TO STAGING.FIELDNAME
+
+
+
+
+
+
+
+
+
+
+
+
+-- Compare REPORTINGTABLE column name to STAGINGTABLE.FieldValue
+
+
+-- Set a while Loop for validity of REPORTINGTABLECOLUMNNAMES == STAGINGCOLUMNNAMES
+--      IF TRUE ==
+--      INSERT INTO REPORTINGTABLE VALUES (STAGINGTABLE.LAN, STAGINGTABLE.Comment, STAGINGTABLE.FieldValue) WHERE REPORTINGTABLECOLUMNNAMES.col == STAGINGTABLE.FieldName;
+--                  ELSEIF REPORTINGTABLECOLUMNNAMES.col <> STAGINGTABLE.FieldName 
+--                      ALTER TABLE REPORTINGTABLE ADDCOLUMN (FieldName)
+
+--      ELSE ==
+--      Shutdown loop
+--
+--
+--      Scalability report wise -
+--          Query for report name as table,
+--              TRUE -- write the function tot hat table
+--              False -- Create new talbe, then write function to that 4WW
+-- 
+--
+
+
+
+
+                                                                                    --    -> RETURNS AS JSON    --
+                                                                                    --   ->> RETURNS AS STRING  --
+
+
+
+
+
+
+                                        --                          Idea is to grab information from the paylaod, disect all of the Field names as "X"
+                                        --                          Then, we need to pull the columns already in Reporting Table as "Y"
+                                        --                          IF X==Y then insert the specific node of JSON as is,
+                                        --                          ELSEIF X<>Y then ADD COLUMN fieldname varchar(20)
+
+
+
+
+--                                                                                      TO RETURN COLUMNS OF A TABLE:
+
+
+                                                                                    --  SELECT attrelid::regclass AS tbl
+                                                                                    --         , attname            AS col
+                                                                                    --      , atttypid::regtype  AS datatype
+                                                                                    --      FROM   pg_attribute
+                                                                                    --  WHERE  attrelid = 'tableauextension'::regclass  
+                                                                                    --  AND    attnum > 0
+                                                                                    --  AND    NOT attisdropped
+                                                                                    --  ORDER  BY attnum;
+
+
+
+
+                                                                                    -- SAMPLE OUTPUT
+                                                                                    -- tbl             col             datatype
+                                                                                    --tblu             LAN               character varying
+                                                                                    --tblu             Comment           character varying
+                                                                                    --tblu             Payload           character varying
+                                                                                    --
+
+
